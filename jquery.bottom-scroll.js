@@ -2,9 +2,9 @@
   $.fn.bottom_scroll = function(opts) {
     var options = $.extend({},
         {
-          class_fixed: 'bottom-scroll',
-          on_fixed: function(){},
-          on_relative: function(){}
+          css_class: 'bottom-scroll',
+          out_of_viewport: function(){},
+          back_in_viewport: function(){}
         },
         opts || {}
     );
@@ -12,17 +12,21 @@
     return this.each(function() {
       var $this = $(this);
       var $window = $(window);
-      var buttons_position = $this.position().top + $this.outerHeight();
+      var element_position = $this.position().top + $this.outerHeight();
 
       var switch_classes = function() {
         var bottom_edge_position = $window.scrollTop() + $window.innerHeight();
 
-        if (bottom_edge_position < buttons_position) {
-          $this.addClass(options.class_fixed);
-          options.on_fixed.call($this);
+        if (bottom_edge_position < element_position) {
+          if ( ! $this.hasClass(options.css_class)) {
+            $this.addClass(options.css_class);
+            options.out_of_viewport.call($this);
+          }
         } else {
-          $this.removeClass(options.class_fixed);
-          options.on_relative.call($this);
+          if ($this.hasClass(options.css_class)) {
+            $this.removeClass(options.css_class);
+            options.back_in_viewport.call($this);
+          }
         }
       };
 
